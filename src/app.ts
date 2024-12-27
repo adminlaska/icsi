@@ -1,28 +1,33 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import { pool } from './config/database';
 import chatRoutes from './routes/chatRoutes';
 import botRoutes from './routes/botRoutes';
+import supplierRoutes from './routes/supplierRoutes';
+import questionRoutes from './routes/questionRoutes';
 
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3030;
+const port = process.env.PORT || 3000;
 
+// Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/api', chatRoutes);
 app.use('/api/bot', botRoutes);
+app.use('/api/suppliers', supplierRoutes);
+app.use('/api/questions', questionRoutes);
 
-// Einfacher Health-Check
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK' });
+app.get('/', (req: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Verbesserte Fehlerbehandlung
 app.listen(port, () => {
   console.log(`Server läuft auf Port ${port}`);
   console.log('Verfügbare Endpunkte:');
@@ -30,6 +35,7 @@ app.listen(port, () => {
   console.log(`- POST   http://localhost:${port}/api/questions`);
   console.log(`- DELETE http://localhost:${port}/api/questions/:id`);
   console.log(`- POST   http://localhost:${port}/api/bot/chat`);
+  console.log(`- GET    http://localhost:${port}/api/suppliers`);
 }).on('error', (error: any) => {
   if (error.code === 'EADDRINUSE') {
     console.error(`Port ${port} ist bereits in Verwendung.`);
