@@ -8,128 +8,178 @@
 </head>
 <body>
     <div id="app">
-        <div class="filter-container">
-            <div class="filter-group">
-                <label for="marketType">Markttyp:</label>
-                <select id="marketType">
-                    <option value="all">Alle</option>
-                    <option value="spot">SPOT</option>
-                    <option value="termin">TERMIN</option>
-                </select>
+        <header class="sticky-header">
+            <div class="filter-container">
+                <div class="filter-group">
+                    <label for="marketType">Markttyp:</label>
+                    <select id="marketType">
+                        <option value="all">Alle</option>
+                        <option value="spot">SPOT</option>
+                        <option value="termin">TERMIN</option>
+                    </select>
 
-                <label for="energyType">Energieart:</label>
-                <select id="energyType">
-                    <option value="all">Alle</option>
-                    <option value="strom">Strom</option>
-                    <option value="gas">Gas</option>
-                </select>
+                    <label for="energyType">Energieart:</label>
+                    <select id="energyType">
+                        <option value="all">Alle</option>
+                        <option value="strom">Strom</option>
+                        <option value="gas">Gas</option>
+                    </select>
 
-                <label for="supplier">Lieferant:</label>
-                <select id="supplier">
-                    <option value="all">Alle</option>
-                </select>
-
-                <button class="add-supplier-btn" onclick="openSupplierModal()">Neuer Lieferant</button>
-            </div>
-        </div>
-        <div id="suppliers-container" class="suppliers-grid"></div>
-    </div>
-
-    <!-- Modal für neue Lieferanten -->
-    <div id="supplierModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Neuen Lieferanten hinzufügen</h2>
-            <form id="supplierForm">
-                <div class="form-group">
-                    <label for="supplierName">Name:</label>
-                    <input type="text" id="supplierName" required>
+                    <label for="supplier">Lieferant:</label>
+                    <select id="supplier">
+                        <option value="all">Alle</option>
+                    </select>
                 </div>
                 
-                <div class="form-group">
-                    <label>Markttypen:</label>
-                    <div class="checkbox-group">
-                        <label>
-                            <input type="checkbox" name="market_types" value="spot"> SPOT
-                        </label>
-                        <label>
-                            <input type="checkbox" name="market_types" value="termin"> TERMIN
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Energietypen:</label>
-                    <div class="checkbox-group">
-                        <label>
-                            <input type="checkbox" name="energy_types" value="gas"> Gas
-                        </label>
-                        <label>
-                            <input type="checkbox" name="energy_types" value="strom"> Strom
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Messtypen:</label>
-                    <div class="checkbox-group">
-                        <label>
-                            <input type="checkbox" name="measurement_types" value="rlm"> RLM
-                        </label>
-                        <label>
-                            <input type="checkbox" name="measurement_types" value="slp"> SLP
-                        </label>
-                    </div>
-                </div>
-
-                <button type="submit" class="submit-btn">Speichern</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal für neue Fragen -->
-    <div id="questionModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Neue Frage hinzufügen</h2>
-            <form id="questionForm">
-                <div class="form-group">
-                    <label for="category">Kategorie:</label>
-                    <select id="category" required>
-                        <!-- Wird dynamisch gefüllt -->
-                    </select>
-                    <button type="button" class="add-category-btn" onclick="openCategoryModal()">
-                        Neue Kategorie
+                <div class="action-buttons">
+                    <button class="add-supplier-btn" onclick="openSupplierModal()">
+                        <span class="plus-icon">+</span>
+                        Neuer Lieferant
+                    </button>
+                    <button class="admin-btn" onclick="openAdminModal()">
+                        <span class="plus-icon">+</span>
+                        <span class="button-text">Verwaltung</span>
                     </button>
                 </div>
-                <div class="form-group">
-                    <label for="question">Frage:</label>
-                    <input type="text" id="question" required>
-                </div>
-                <div class="form-group">
-                    <label for="answer">Antwort:</label>
-                    <input type="text" id="answer" required>
-                </div>
-                <button type="submit" class="submit-btn">Speichern</button>
-            </form>
+            </div>
+        </header>
+        
+        <div class="content">
+            <div id="suppliers-container" class="suppliers-grid"></div>
         </div>
-    </div>
 
-    <!-- Modal für neue Kategorien -->
-    <div id="categoryModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Neue Kategorie hinzuf��gen</h2>
-            <form id="categoryForm">
-                <div class="form-group">
-                    <label for="newCategory">Kategoriename:</label>
-                    <input type="text" id="newCategory" required>
-                </div>
-                <button type="submit" class="submit-btn">Kategorie speichern</button>
-            </form>
+        <!-- Supplier Modal -->
+        <div id="supplierModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Neuer Lieferant</h2>
+                
+                <form id="supplierForm">
+                    <div class="form-group">
+                        <label for="supplierName">Name:</label>
+                        <input type="text" id="supplierName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="marketTypeSelect">Markttyp:</label>
+                        <select id="marketTypeSelect" required>
+                            <option value="">Bitte wählen</option>
+                            <option value="spot">SPOT</option>
+                            <option value="termin">TERMIN</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Energietyp:</label>
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="energyType" value="strom"> Strom
+                            </label>
+                            <label>
+                                <input type="checkbox" name="energyType" value="gas"> Gas
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Messtyp:</label>
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="measurementType" value="rlm"> RLM
+                            </label>
+                            <label>
+                                <input type="checkbox" name="measurementType" value="slp"> SLP
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="categorySelect">Kategorie:</label>
+                        <select id="categorySelect" required>
+                            <option value="">Bitte wählen</option>
+                            <option value="standard">Standard</option>
+                            <option value="premium">Premium</option>
+                            <option value="enterprise">Enterprise</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Speichern</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Admin Modal -->
+        <div id="adminModal" class="modal">
+            <div class="modal-content admin-modal">
+                <span class="close">&times;</span>
+                <h2>Verwaltung</h2>
+                
+                <form id="adminForm" class="admin-form">
+                    <!-- Schritt 1: Lieferant -->
+                    <div class="form-section">
+                        <h3>1. Lieferant auswählen</h3>
+                        <select id="adminSupplier" required>
+                            <option value="">Lieferant auswählen</option>
+                        </select>
+                    </div>
+
+                    <!-- Schritt 2: Kategorie -->
+                    <div class="form-section">
+                        <h3>2. Kategorie</h3>
+                        <select id="adminCategory" required>
+                            <option value="">Kategorie auswählen</option>
+                        </select>
+                    </div>
+
+                    <!-- Schritt 3: Energietyp -->
+                    <div class="form-section">
+                        <h3>3. Energietyp</h3>
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="energyType" value="strom"> Strom
+                            </label>
+                            <label>
+                                <input type="checkbox" name="energyType" value="gas"> Gas
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Schritt 4: Messtyp -->
+                    <div class="form-section">
+                        <h3>4. Messtyp</h3>
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="measurementType" value="rlm"> RLM
+                            </label>
+                            <label>
+                                <input type="checkbox" name="measurementType" value="slp"> SLP
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Schritt 5: Frage und Antworten -->
+                    <div class="form-section">
+                        <h3>5. Frage und Antworten</h3>
+                        <textarea id="questionText" placeholder="Ihre Frage" required></textarea>
+                        
+                        <div id="answersContainer">
+                            <!-- Hier werden die Antwort-Inputs dynamisch hinzugefügt -->
+                        </div>
+                        
+                        <button type="button" class="secondary-btn" onclick="addAnswerInput()">
+                            <span class="plus-icon">+</span> Weitere Antwort
+                        </button>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn">Speichern</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
     <script src="script.js"></script>
+    <script src="admin.js"></script>
 </body>
 </html>

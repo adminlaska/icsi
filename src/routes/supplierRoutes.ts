@@ -135,59 +135,63 @@ const createQuestion: RequestHandler = async (req, res, next) => {
     }
 };
 
+interface SupplierData {
+    name: string;
+    market_type: string;
+    energy_types: string[];
+    measurement_types: string[];
+    category: string;
+}
+
 const createSupplier: RequestHandler = async (req, res, next) => {
-    const { 
-        name, 
-        market_types, // Array von market_types ['spot', 'termin']
-        energy_types, // Array von energy_types ['gas', 'strom']
-        measurement_types // Array von measurement_types ['rlm', 'slp']
-    } = req.body;
-
+    const client = await pool.connect();
+    
     try {
-        // Prüfen ob Lieferant bereits existiert
-        const existingSupplier = await pool.query(
-            'SELECT id FROM suppliers WHERE name = $1',
-            [name]
+        const data: SupplierData = req.body;
+        
+        await client.query('BEGIN');
+
+        // Lieferanten einfügen
+        const supplierResult = await client.query(
+            `INSERT INTO suppliers (name, market_type, category)
+             VALUES ($1, $2, $3)
+             RETURNING id`,
+            [data.name, data.market_type, data.category]
         );
-
-        if (existingSupplier.rows.length > 0) {
-            res.status(400).json({ error: 'Lieferant existiert bereits' });
-            return;
-        }
-
-        // Lieferant einfügen
-        const supplierResult = await pool.query(
-            'INSERT INTO suppliers (name) VALUES ($1) RETURNING id',
-            [name]
-        );
-
+        
         const supplierId = supplierResult.rows[0].id;
 
-        // Zuordnungen einfügen
-        for (const market_type of market_types) {
-            await pool.query(
-                'INSERT INTO supplier_market_types (supplier_id, market_type_id) VALUES ($1, (SELECT id FROM market_types WHERE name = $2))',
-                [supplierId, market_type]
+        // Energietypen verknüpfen
+        for (const energyType of data.energy_types) {
+            await client.query(
+                `INSERT INTO supplier_energy_types (supplier_id, energy_type)
+                 VALUES ($1, $2)`,
+                [supplierId, energyType]
             );
         }
 
-        for (const energy_type of energy_types) {
-            await pool.query(
-                'INSERT INTO supplier_energy_types (supplier_id, energy_type_id) VALUES ($1, (SELECT id FROM energy_types WHERE name = $2))',
-                [supplierId, energy_type]
+        // Messtypen verknüpfen
+        for (const measurementType of data.measurement_types) {
+            await client.query(
+                `INSERT INTO supplier_measurement_types (supplier_id, measurement_type)
+                 VALUES ($1, $2)`,
+                [supplierId, measurementType]
             );
         }
 
-        for (const measurement_type of measurement_types) {
-            await pool.query(
-                'INSERT INTO supplier_measurement_types (supplier_id, measurement_type_id) VALUES ($1, (SELECT id FROM measurement_types WHERE name = $2))',
-                [supplierId, measurement_type]
-            );
-        }
+        await client.query('COMMIT');
+        
+        res.status(201).json({
+            message: 'Lieferant erfolgreich erstellt',
+            supplierId,
+            name: data.name
+        });
 
-        res.status(201).json({ message: 'Lieferant erfolgreich hinzugefügt' });
     } catch (error) {
+        await client.query('ROLLBACK');
         next(error);
+    } finally {
+        client.release();
     }
 };
 

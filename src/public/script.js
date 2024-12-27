@@ -35,6 +35,11 @@ function filterAndDisplaySuppliers() {
     const selectedSupplier = document.getElementById('supplier').value;
     const container = document.getElementById('suppliers-container');
     
+    if (!container) {
+        console.error('suppliers-container not found');
+        return;
+    }
+    
     container.innerHTML = '';
     
     const filteredSuppliers = allSuppliers.filter(supplier => {
@@ -101,6 +106,16 @@ function filterAndDisplaySuppliers() {
         container.appendChild(card);
     });
 }
+
+// Scroll Handler
+document.addEventListener('scroll', function() {
+    const header = document.querySelector('.sticky-header');
+    if (window.scrollY > 10) {
+        header.classList.add('scrolled');
+    } else {
+        header.classList.remove('scrolled');
+    }
+});
 
 // Event Listener für Filter
 document.addEventListener('DOMContentLoaded', () => {

@@ -1,3 +1,19 @@
+/* Sticky Header Styles - am Anfang der CSS-Datei */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 8px 15px;
+    transition: all 0.3s ease;
+    background: transparent;
+    width: 100%;
+}
+
+.sticky-header.scrolled {
+    background: transparent;
+    padding-top: 5px;
+}
+
 /* Moderne Variablen für einheitliche Farben und Abstände */
 :root {
     --primary-color: #2196F3;
@@ -21,75 +37,178 @@ body {
 /* Filter Container Styling */
 .filter-container {
     background: white;
-    padding: 20px;
-    box-shadow: var(--box-shadow);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    padding: 15px 25px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    width: 95%;
+    max-width: 1600px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
 }
 
 .filter-group {
     display: flex;
     align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
+    gap: 15px;
+    flex-grow: 1;
 }
 
-/* Button Styling */
-.add-supplier-btn {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    font-weight: 500;
-    transition: var(--transition);
+.filter-group label {
+    white-space: nowrap;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.filter-group select {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 120px;
+    font-size: 0.9em;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.add-supplier-btn,
+.admin-btn {
     display: flex;
     align-items: center;
     gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    min-width: 140px;
+    justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.add-supplier-btn:before {
-    content: '+';
-    font-size: 20px;
-    font-weight: bold;
+.add-supplier-btn {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
+}
+
+.admin-btn {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+    color: white;
+    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2);
 }
 
 .add-supplier-btn:hover {
-    background-color: var(--primary-hover);
+    background: linear-gradient(135deg, #45a049, #3d8b40);
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+}
+
+.admin-btn:hover {
+    background: linear-gradient(135deg, #1976D2, #1565C0);
+    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+    transform: translateY(-1px);
+}
+
+.add-supplier-btn:active,
+.admin-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.plus-icon {
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 4px;
+}
+
+/* Hover-Effekt für die Icons */
+.add-supplier-btn:hover .plus-icon,
+.admin-btn:hover .plus-icon {
+    transform: rotate(90deg);
+    transition: transform 0.3s ease;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .filter-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-group {
+        flex-wrap: wrap;
+    }
+
+    .action-buttons {
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 768px) {
+    .filter-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-group select {
+        width: 100%;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .add-supplier-btn,
+    .admin-btn {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 /* Modal Styling */
 .modal {
     display: none;
     position: fixed;
-    top: 0;
+    z-index: 1000;
     left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    z-index: 1000;
-    animation: fadeIn 0.3s ease;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+}
+
+/* Wenn das Modal aktiv ist */
+.modal.active {
+    display: flex;
 }
 
 .modal-content {
-    background-color: white;
-    margin: 5% auto;
+    background-color: #fefefe;
+    margin: 10% auto;
     padding: 30px;
     border-radius: var(--border-radius);
-    width: 90%;
-    max-width: 600px;
-    position: relative;
     box-shadow: var(--box-shadow);
-    animation: slideIn 0.3s ease;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
 }
 
 /* Form Styling */
 .form-group {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 .form-group label {
@@ -101,25 +220,16 @@ body {
 
 .form-group input[type="text"] {
     width: 100%;
-    padding: 12px;
-    border: 2px solid #e0e0e0;
-    border-radius: var(--border-radius);
-    font-size: 16px;
-    transition: var(--transition);
-}
-
-.form-group input[type="text"]:focus {
-    border-color: var(--primary-color);
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
 }
 
 /* Checkbox Styling */
 .checkbox-group {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 15px;
-    margin-top: 10px;
+    display: flex;
+    gap: 20px;
 }
 
 .checkbox-group label {
@@ -130,73 +240,35 @@ body {
     cursor: pointer;
 }
 
-.checkbox-group input[type="checkbox"] {
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #e0e0e0;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: var(--transition);
-    position: relative;
-}
-
-.checkbox-group input[type="checkbox"]:checked {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-}
-
-.checkbox-group input[type="checkbox"]:checked:after {
-    content: '✓';
-    color: white;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 14px;
-}
-
 /* Submit Button Styling */
 .submit-btn {
-    background-color: var(--success-color);
+    background-color: var(--primary-color);
     color: white;
-    padding: 12px 24px;
+    padding: 10px 20px;
     border: none;
-    border-radius: var(--border-radius);
+    border-radius: 4px;
     cursor: pointer;
+    font-size: 1em;
     width: 100%;
-    font-size: 16px;
-    font-weight: 500;
-    transition: var(--transition);
 }
 
 .submit-btn:hover {
-    background-color: var(--success-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+    background-color: var(--primary-hover);
 }
 
 /* Close Button Styling */
 .close {
     position: absolute;
     right: 20px;
-    top: 20px;
-    font-size: 24px;
+    top: 15px;
+    font-size: 28px;
     font-weight: bold;
     color: #666;
     cursor: pointer;
-    transition: var(--transition);
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
 }
 
 .close:hover {
     color: #333;
-    background-color: #f5f5f5;
 }
 
 /* Animations */
@@ -470,4 +542,255 @@ body {
 .type-badge.measurement {
     background-color: #e8f5e9;
     color: #43a047;
+}
+
+/* Admin Controls */
+.admin-controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+}
+
+.admin-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.admin-btn:hover {
+    background-color: var(--primary-hover);
+}
+
+.admin-btn .plus-icon {
+    font-size: 24px;
+    line-height: 1;
+}
+
+.admin-btn .tooltip {
+    position: absolute;
+    right: 50px;
+    background: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.admin-btn:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Admin Modal Styles */
+.admin-modal {
+    background: white;
+    max-width: 800px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+    margin: 40px auto;
+    padding: 30px;
+    border-radius: 8px;
+    position: relative;
+}
+
+.admin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding-right: 15px;
+}
+
+.form-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.form-section h3 {
+    margin: 0 0 15px 0;
+    color: #2c3e50;
+    font-size: 1.1em;
+}
+
+.checkbox-group {
+    display: flex;
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.answer-input {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.answer-input textarea {
+    flex: 1;
+    min-height: 60px;
+}
+
+.secondary-btn {
+    background: #e9ecef;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.secondary-btn:hover {
+    background: #dee2e6;
+}
+
+.save-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+#newCategoryInput {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+#newCategoryInput input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Scrollbar Styling */
+.admin-modal::-webkit-scrollbar {
+    width: 8px;
+}
+
+.admin-modal::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.admin-modal::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.admin-modal::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+.answer-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.answer-row textarea {
+    flex: 1;
+    min-height: 60px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    padding: 8px 0;
+}
+
+.remove-answer {
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    margin-top: 8px;
+}
+
+.remove-answer:hover {
+    background: #cc0000;
+}
+
+.form-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.form-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.checkbox-group {
+    display: flex;
+    gap: 20px;
+    margin: 10px 0;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#questionText {
+    width: 100%;
+    min-height: 100px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    resize: vertical;
 }

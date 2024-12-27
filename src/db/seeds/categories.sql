@@ -1,0 +1,22 @@
+INSERT INTO question_categories (name) VALUES
+    ('Bündelung'),
+    ('Verbrauchsbereich'),
+    ('Pflichtangaben'),
+    ('Preisanpassung'),
+    ('Vertragslaufzeit'),
+    ('Kündigungsfrist'),
+    ('Abrechnung'),
+    ('Zahlungsbedingungen'),
+    ('Sicherheitsleistung'),
+    ('Messung'),
+    ('Netznutzung'),
+    ('Bilanzierung'),
+    ('Kommunikation'),
+    ('Datenaustausch'),
+    ('Qualitätsanforderungen'),
+    ('Haftung'),
+    ('Höhere Gewalt'),
+    ('Vertraulichkeit'),
+    ('Bonitätsprüfung'),
+    ('Steuern und Abgaben')
+ON CONFLICT (name) DO NOTHING; 

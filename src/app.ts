@@ -7,6 +7,7 @@ import chatRoutes from './routes/chatRoutes';
 import botRoutes from './routes/botRoutes';
 import supplierRoutes from './routes/supplierRoutes';
 import questionRoutes from './routes/questionRoutes';
+import categoryRoutes from './routes/categoryRoutes';
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use('/api', chatRoutes);
 app.use('/api/bot', botRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/questions', questionRoutes);
+app.use('/api/categories', categoryRoutes);
 
 app.get('/', (req: Request, res: Response) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
