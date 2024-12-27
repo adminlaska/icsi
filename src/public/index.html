@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lieferanten Übersicht</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <div class="filter-container">
+            <div class="filter-group">
+                <label for="marketType">Markttyp:</label>
+                <select id="marketType">
+                    <option value="all">Alle</option>
+                    <option value="spot">SPOT</option>
+                    <option value="termin">TERMIN</option>
+                </select>
+
+                <label for="supplier">Lieferant:</label>
+                <select id="supplier">
+                    <option value="all">Alle</option>
+                </select>
+            </div>
+        </div>
+        <div id="suppliers-container" class="suppliers-grid"></div>
+    </div>
+
+    <!-- Modal für neue Fragen -->
+    <div id="questionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Neue Frage hinzufügen</h2>
+            <form id="questionForm">
+                <div class="form-group">
+                    <label for="category">Kategorie:</label>
+                    <select id="category" required>
+                        <!-- Wird dynamisch gefüllt -->
+                    </select>
+                    <button type="button" class="add-category-btn" onclick="openCategoryModal()">
+                        Neue Kategorie
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label for="question">Frage:</label>
+                    <input type="text" id="question" required>
+                </div>
+                <div class="form-group">
+                    <label for="answer">Antwort:</label>
+                    <input type="text" id="answer" required>
+                </div>
+                <button type="submit" class="submit-btn">Speichern</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal für neue Kategorien -->
+    <div id="categoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Neue Kategorie hinzufügen</h2>
+            <form id="categoryForm">
+                <div class="form-group">
+                    <label for="newCategory">Kategoriename:</label>
+                    <input type="text" id="newCategory" required>
+                </div>
+                <button type="submit" class="submit-btn">Kategorie speichern</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
