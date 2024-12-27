@@ -17,13 +17,74 @@
                     <option value="termin">TERMIN</option>
                 </select>
 
+                <label for="energyType">Energieart:</label>
+                <select id="energyType">
+                    <option value="all">Alle</option>
+                    <option value="strom">Strom</option>
+                    <option value="gas">Gas</option>
+                </select>
+
                 <label for="supplier">Lieferant:</label>
                 <select id="supplier">
                     <option value="all">Alle</option>
                 </select>
+
+                <button class="add-supplier-btn" onclick="openSupplierModal()">Neuer Lieferant</button>
             </div>
         </div>
         <div id="suppliers-container" class="suppliers-grid"></div>
+    </div>
+
+    <!-- Modal für neue Lieferanten -->
+    <div id="supplierModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Neuen Lieferanten hinzufügen</h2>
+            <form id="supplierForm">
+                <div class="form-group">
+                    <label for="supplierName">Name:</label>
+                    <input type="text" id="supplierName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Markttypen:</label>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" name="market_types" value="spot"> SPOT
+                        </label>
+                        <label>
+                            <input type="checkbox" name="market_types" value="termin"> TERMIN
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Energietypen:</label>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" name="energy_types" value="gas"> Gas
+                        </label>
+                        <label>
+                            <input type="checkbox" name="energy_types" value="strom"> Strom
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Messtypen:</label>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" name="measurement_types" value="rlm"> RLM
+                        </label>
+                        <label>
+                            <input type="checkbox" name="measurement_types" value="slp"> SLP
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Speichern</button>
+            </form>
+        </div>
     </div>
 
     <!-- Modal für neue Fragen -->
@@ -58,7 +119,7 @@
     <div id="categoryModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Neue Kategorie hinzufügen</h2>
+            <h2>Neue Kategorie hinzuf��gen</h2>
             <form id="categoryForm">
                 <div class="form-group">
                     <label for="newCategory">Kategoriename:</label>

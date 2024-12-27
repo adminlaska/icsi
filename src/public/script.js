@@ -1,260 +1,113 @@
 // src/public/script.js
 let allSuppliers = [];
-let categories = [];
 
 async function fetchSuppliers() {
     try {
+        console.log('Fetching suppliers...');
         const response = await fetch('/api/suppliers');
-        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
-        // Gruppiere die Daten nach Lieferant und Markttyp
-        const groupedData = data.reduce((acc, item) => {
-            if (!acc[item.name]) {
-                acc[item.name] = {
-                    name: item.name,
-                    spot_questions: [],
-                    termin_questions: []
-                };
-            }
-            
-            if (item.market_type === 'spot') {
-                acc[item.name].spot_questions.push({
-                    category: item.category,
-                    question: item.question,
-                    answers: item.answers
-                });
-            } else if (item.market_type === 'termin') {
-                acc[item.name].termin_questions.push({
-                    category: item.category,
-                    question: item.question,
-                    answers: item.answers
-                });
-            }
-            
-            return acc;
-        }, {});
-
-        allSuppliers = Object.values(groupedData);
-        updateSupplierFilter(allSuppliers);
-        displaySuppliers(allSuppliers);
+        allSuppliers = await response.json();
+        console.log('Received suppliers:', allSuppliers);
+        updateSupplierSelect();
+        filterAndDisplaySuppliers();
     } catch (error) {
         console.error('Error fetching suppliers:', error);
     }
 }
 
-function updateSupplierFilter(suppliers) {
+function updateSupplierSelect() {
     const supplierSelect = document.getElementById('supplier');
-    const currentValue = supplierSelect.value;
+    const uniqueSuppliers = [...new Set(allSuppliers.map(s => s.name))];
     
-    // Clear existing options except "Alle"
     supplierSelect.innerHTML = '<option value="all">Alle</option>';
-    
-    // Add supplier options
-    suppliers.forEach(supplier => {
-        const option = document.createElement('option');
-        option.value = supplier.name;
-        option.textContent = supplier.name;
-        supplierSelect.appendChild(option);
+    uniqueSuppliers.forEach(name => {
+        supplierSelect.innerHTML += `<option value="${name}">${name}</option>`;
     });
-    
-    // Restore previous selection if it exists
-    if (currentValue !== 'all') {
-        supplierSelect.value = currentValue;
-    }
 }
 
-function displaySuppliers(suppliers) {
-    const container = document.getElementById('suppliers-container');
+function filterAndDisplaySuppliers() {
+    console.log('Filtering suppliers...');
     const marketType = document.getElementById('marketType').value;
+    const energyType = document.getElementById('energyType').value;
     const selectedSupplier = document.getElementById('supplier').value;
+    const container = document.getElementById('suppliers-container');
     
     container.innerHTML = '';
     
-    suppliers.forEach(supplier => {
-        if (selectedSupplier !== 'all' && supplier.name !== selectedSupplier) {
-            return;
-        }
+    const filteredSuppliers = allSuppliers.filter(supplier => {
+        const marketTypeMatch = marketType === 'all' || supplier.market_type.toLowerCase() === marketType.toLowerCase();
+        const energyTypeMatch = energyType === 'all' || supplier.energy_types.includes(energyType);
+        const supplierMatch = selectedSupplier === 'all' || supplier.name === selectedSupplier;
+        
+        return marketTypeMatch && energyTypeMatch && supplierMatch;
+    });
 
-        const supplierRow = document.createElement('div');
-        supplierRow.className = 'supplier-card';
+    console.log('Filtered suppliers:', filteredSuppliers);
+
+    if (filteredSuppliers.length === 0) {
+        container.innerHTML = `
+            <div class="no-suppliers">
+                Keine Lieferanten gefunden
+            </div>
+        `;
+        return;
+    }
+
+    filteredSuppliers.forEach(supplier => {
+        const card = document.createElement('div');
+        card.className = 'supplier-card';
         
-        const nameCell = document.createElement('div');
-        nameCell.className = 'supplier-name';
-        nameCell.textContent = supplier.name;
-        
-        const spotCell = document.createElement('div');
-        spotCell.className = 'market-section';
-        
-        const terminCell = document.createElement('div');
-        terminCell.className = 'market-section';
-        
-        if (marketType === 'all' || marketType === 'spot') {
-            spotCell.innerHTML = `
-                <h3>SPOT Fragen</h3>
-                <div class="question-list">
-                    ${createQuestionsList(supplier.spot_questions || [])}
+        card.innerHTML = `
+            <div class="card-header">
+                <h3>${supplier.name}</h3>
+                <span class="category">${supplier.category}</span>
+            </div>
+            
+            <div class="supplier-info">
+                <div class="type-group">
+                    ${supplier.energy_types.map(type => 
+                        `<span class="type-badge energy">${type}</span>`
+                    ).join('')}
+                    <span class="type-badge market">${supplier.market_type}</span>
                 </div>
-                <button class="add-button" onclick="handleAddQuestion('${supplier.name}', 'spot')">+</button>
-            `;
-        }
-        
-        if (marketType === 'all' || marketType === 'termin') {
-            terminCell.innerHTML = `
-                <h3>TERMIN Fragen</h3>
-                <div class="question-list">
-                    ${createQuestionsList(supplier.termin_questions || [])}
+                <div class="type-group">
+                    ${Array.isArray(supplier.measurement_types) ? 
+                        supplier.measurement_types.map(type => 
+                            `<span class="type-badge measurement">${type}</span>`
+                        ).join('') 
+                        : ''
+                    }
                 </div>
-                <button class="add-button" onclick="handleAddQuestion('${supplier.name}', 'termin')">+</button>
-            `;
-        }
+            </div>
+
+            <div class="content-divider"></div>
+            
+            <div class="questions-container">
+                <div class="question-item">
+                    <div class="question-text">${supplier.question}</div>
+                    ${Array.isArray(supplier.answers) ? 
+                        supplier.answers.map(answer => 
+                            `<div class="answer-text">${answer.answer_text}</div>`
+                        ).join('') 
+                        : ''
+                    }
+                </div>
+            </div>
+        `;
         
-        supplierRow.appendChild(nameCell);
-        if (marketType === 'all' || marketType === 'spot') supplierRow.appendChild(spotCell);
-        if (marketType === 'all' || marketType === 'termin') supplierRow.appendChild(terminCell);
-        
-        container.appendChild(supplierRow);
+        container.appendChild(card);
     });
 }
 
-function createQuestionsList(questions) {
-    if (!questions || questions.length === 0) {
-        return '<p>Keine Fragen vorhanden</p>';
-    }
-    
-    return questions.map(q => `
-        <div class="question-item">
-            <p><strong>${q.category}:</strong> ${q.question}</p>
-            <p>Antwort: ${q.answers[0].answer_text}</p>
-        </div>
-    `).join('');
-}
-
-function handleAddQuestion(supplierName, marketType) {
-    const modal = document.getElementById('questionModal');
-    const form = document.getElementById('questionForm');
-    const closeBtn = modal.querySelector('.close');
-
-    if (categories.length === 0) {
-        fetchCategories();
-    }
-
-    modal.style.display = 'block';
-
-    closeBtn.onclick = () => {
-        modal.style.display = 'none';
-    };
-
-    window.onclick = (event) => {
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    };
-
-    form.onsubmit = async (e) => {
-        e.preventDefault();
-
-        const questionData = {
-            supplier_name: supplierName,
-            market_type: marketType,
-            category: document.getElementById('category').value,
-            question: document.getElementById('question').value,
-            answer: document.getElementById('answer').value
-        };
-
-        try {
-            const response = await fetch('/api/suppliers/questions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(questionData)
-            });
-
-            if (response.ok) {
-                modal.style.display = 'none';
-                form.reset();
-                fetchSuppliers();
-            } else {
-                alert('Fehler beim Speichern der Frage');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Fehler beim Speichern der Frage');
-        }
-    };
-}
-
-async function fetchCategories() {
-    try {
-        const response = await fetch('/api/suppliers/categories');
-        categories = await response.json();
-        updateCategorySelect();
-    } catch (error) {
-        console.error('Error fetching categories:', error);
-    }
-}
-
-function updateCategorySelect() {
-    const categorySelect = document.getElementById('category');
-    categorySelect.innerHTML = categories
-        .map(cat => `<option value="${cat.name}">${cat.name}</option>`)
-        .join('');
-}
-
-function openCategoryModal() {
-    const modal = document.getElementById('categoryModal');
-    const form = document.getElementById('categoryForm');
-    const closeBtn = modal.querySelector('.close');
-
-    modal.style.display = 'block';
-
-    closeBtn.onclick = () => modal.style.display = 'none';
-    
-    window.onclick = (event) => {
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    };
-
-    form.onsubmit = async (e) => {
-        e.preventDefault();
-        
-        const categoryName = document.getElementById('newCategory').value;
-        
-        try {
-            const response = await fetch('/api/suppliers/categories', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ name: categoryName })
-            });
-
-            if (response.ok) {
-                await fetchCategories();
-                modal.style.display = 'none';
-                form.reset();
-            } else {
-                alert('Fehler beim Speichern der Kategorie');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Fehler beim Speichern der Kategorie');
-        }
-    };
-}
-
 // Event Listener für Filter
-document.getElementById('marketType').addEventListener('change', () => {
-    displaySuppliers(allSuppliers);
-});
-
-document.getElementById('supplier').addEventListener('change', () => {
-    displaySuppliers(allSuppliers);
-});
-
-// Initialer Load
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing...');
     fetchSuppliers();
-    fetchCategories();
+    
+    document.getElementById('marketType').addEventListener('change', filterAndDisplaySuppliers);
+    document.getElementById('energyType').addEventListener('change', filterAndDisplaySuppliers);
+    document.getElementById('supplier').addEventListener('change', filterAndDisplaySuppliers);
 });
