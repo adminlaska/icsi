@@ -3,126 +3,126 @@ let allSuppliers = [];
 
 async function fetchSuppliers() {
     try {
-        console.log('Fetching suppliers...');
         const response = await fetch('/api/suppliers');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        const data = await response.json();
+        console.log('Geladene Daten:', data); // Debug-Log
         
-        allSuppliers = await response.json();
-        console.log('Received suppliers:', allSuppliers);
-        updateSupplierSelect();
-        filterAndDisplaySuppliers();
+        if (!data || !data.suppliers) {
+            throw new Error('Keine Lieferanten-Daten empfangen');
+        }
+
+        allSuppliers = data.suppliers;
+        console.log('Verarbeitete Lieferanten:', allSuppliers); // Debug-Log
+        
+        updateSupplierFilter(allSuppliers);
+        filterSuppliers();
     } catch (error) {
         console.error('Error fetching suppliers:', error);
     }
 }
 
-function updateSupplierSelect() {
-    const supplierSelect = document.getElementById('supplier');
-    const uniqueSuppliers = [...new Set(allSuppliers.map(s => s.name))];
-    
-    supplierSelect.innerHTML = '<option value="all">Alle</option>';
-    uniqueSuppliers.forEach(name => {
-        supplierSelect.innerHTML += `<option value="${name}">${name}</option>`;
-    });
-}
-
-function filterAndDisplaySuppliers() {
-    console.log('Filtering suppliers...');
+function filterSuppliers() {
     const marketType = document.getElementById('marketType').value;
     const energyType = document.getElementById('energyType').value;
     const selectedSupplier = document.getElementById('supplier').value;
+
+    console.log('Filter-Werte:', { marketType, energyType, selectedSupplier }); // Debug-Log
+
+    const filteredSuppliers = allSuppliers.filter(supplier => {
+        const matchSupplier = selectedSupplier === 'all' || 
+                             supplier.id === parseInt(selectedSupplier);
+
+        const matchEnergy = energyType === 'all' || 
+                          (supplier.energy_types && 
+                           supplier.energy_types.includes(energyType));
+
+        return matchSupplier && matchEnergy;
+    });
+
+    console.log('Gefilterte Lieferanten:', filteredSuppliers); // Debug-Log
+    displaySuppliers(filteredSuppliers);
+}
+
+function displaySuppliers(suppliers) {
     const container = document.getElementById('suppliers-container');
-    
     if (!container) {
-        console.error('suppliers-container not found');
+        console.error('Container nicht gefunden!');
         return;
     }
     
     container.innerHTML = '';
     
-    const filteredSuppliers = allSuppliers.filter(supplier => {
-        const marketTypeMatch = marketType === 'all' || supplier.market_type.toLowerCase() === marketType.toLowerCase();
-        const energyTypeMatch = energyType === 'all' || supplier.energy_types.includes(energyType);
-        const supplierMatch = selectedSupplier === 'all' || supplier.name === selectedSupplier;
-        
-        return marketTypeMatch && energyTypeMatch && supplierMatch;
-    });
-
-    console.log('Filtered suppliers:', filteredSuppliers);
-
-    if (filteredSuppliers.length === 0) {
+    if (suppliers.length === 0) {
         container.innerHTML = `
-            <div class="no-suppliers">
-                Keine Lieferanten gefunden
+            <div class="no-results">
+                <p>Keine Lieferanten gefunden für die ausgewählten Filter.</p>
             </div>
         `;
         return;
     }
-
-    filteredSuppliers.forEach(supplier => {
-        const card = document.createElement('div');
-        card.className = 'supplier-card';
-        
-        card.innerHTML = `
-            <div class="card-header">
-                <h3>${supplier.name}</h3>
-                <span class="category">${supplier.category}</span>
-            </div>
-            
-            <div class="supplier-info">
-                <div class="type-group">
-                    ${supplier.energy_types.map(type => 
-                        `<span class="type-badge energy">${type}</span>`
-                    ).join('')}
-                    <span class="type-badge market">${supplier.market_type}</span>
-                </div>
-                <div class="type-group">
-                    ${Array.isArray(supplier.measurement_types) ? 
-                        supplier.measurement_types.map(type => 
-                            `<span class="type-badge measurement">${type}</span>`
-                        ).join('') 
-                        : ''
-                    }
-                </div>
-            </div>
-
-            <div class="content-divider"></div>
-            
-            <div class="questions-container">
-                <div class="question-item">
-                    <div class="question-text">${supplier.question}</div>
-                    ${Array.isArray(supplier.answers) ? 
-                        supplier.answers.map(answer => 
-                            `<div class="answer-text">${answer.answer_text}</div>`
-                        ).join('') 
-                        : ''
-                    }
-                </div>
-            </div>
-        `;
-        
+    
+    suppliers.forEach(supplier => {
+        const card = createSupplierCard(supplier);
         container.appendChild(card);
     });
 }
 
-// Scroll Handler
-document.addEventListener('scroll', function() {
-    const header = document.querySelector('.sticky-header');
-    if (window.scrollY > 10) {
-        header.classList.add('scrolled');
-    } else {
-        header.classList.remove('scrolled');
-    }
-});
+function createSupplierCard(supplier) {
+    console.log('Erstelle Karte für:', supplier); // Debug-Log
+    
+    const card = document.createElement('div');
+    card.className = 'supplier-card';
+    
+    card.innerHTML = `
+        <div class="supplier-header">
+            <h3 class="supplier-name">${supplier.name}</h3>
+            ${supplier.market_type ? `<span class="supplier-type">${supplier.market_type}</span>` : ''}
+        </div>
+        <div class="supplier-details">
+            <div class="detail-item">
+                <span class="detail-label">Energietypen:</span>
+                <div class="tag-container">
+                    ${supplier.energy_types && supplier.energy_types.length > 0 
+                        ? supplier.energy_types.map(type => 
+                            `<span class="tag">${type}</span>`
+                          ).join('') 
+                        : '<span class="no-data">Keine Energietypen</span>'}
+                </div>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Messtypen:</span>
+                <div class="tag-container">
+                    ${supplier.measurement_types && supplier.measurement_types.length > 0
+                        ? supplier.measurement_types.map(type => 
+                            `<span class="tag">${type}</span>`
+                          ).join('')
+                        : '<span class="no-data">Keine Messtypen</span>'}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    return card;
+}
 
-// Event Listener für Filter
+function updateSupplierFilter(suppliers) {
+    const select = document.getElementById('supplier');
+    if (!select) return;
+    
+    select.innerHTML = '<option value="all">Alle Lieferanten</option>';
+    suppliers.forEach(supplier => {
+        select.innerHTML += `<option value="${supplier.id}">${supplier.name}</option>`;
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing...');
     fetchSuppliers();
     
-    document.getElementById('marketType').addEventListener('change', filterAndDisplaySuppliers);
-    document.getElementById('energyType').addEventListener('change', filterAndDisplaySuppliers);
-    document.getElementById('supplier').addEventListener('change', filterAndDisplaySuppliers);
+    const marketTypeSelect = document.getElementById('marketType');
+    const energyTypeSelect = document.getElementById('energyType');
+    const supplierSelect = document.getElementById('supplier');
+    
+    if (marketTypeSelect) marketTypeSelect.addEventListener('change', filterSuppliers);
+    if (energyTypeSelect) energyTypeSelect.addEventListener('change', filterSuppliers);
+    if (supplierSelect) supplierSelect.addEventListener('change', filterSuppliers);
 });
